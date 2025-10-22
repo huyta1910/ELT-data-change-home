@@ -6,11 +6,10 @@ import clickhouse_connect
 import logging
 from typing import List, Dict, Any
 
-# --- Setup ---
 logging.basicConfig(level=logging.INFO)
 load_dotenv()
 
-# --- Configuration ---
+
 # (Database and ClickHouse configs are the same)
 SQL_SERVER = os.getenv('SQL_SERVER_HOST')
 SQL_DATABASE = os.getenv('SQL_DATABASE')
@@ -26,18 +25,13 @@ CLICKHOUSE_DB = os.getenv('CLICKHOUSE_DB', 'analytics_raw') # Staging database f
 
 CHUNKSIZE = 100000
 
-# === VERY IMPORTANT: Configure all tables to be ingested here ===
-# For each table, define:
-# - source_name: The name in SQL Server (dbo.TableName)
-# - dest_name: The desired name in ClickHouse (raw_table_name)
-# - pk: The primary key for de-duplication in ReplacingMergeTree.
-# - incremental_key: The timestamp/version column for incremental logic.
+
 TABLES_TO_INGEST: List[Dict[str, Any]] = [
     {
         "source_name": "dbo.CuaHang",
         "dest_name": "raw_cuahang",
-        "pk": "id", # Assuming 'id' is the primary key
-        "incremental_key": "modified_at" # Assuming a timestamp column exists
+        "pk": "id", 
+        "incremental_key": "modified_at" 
     },
     {
         "source_name": "dbo.Ca",
@@ -65,21 +59,18 @@ TABLES_TO_INGEST: List[Dict[str, Any]] = [
     }
 ]
 
-# --- Reusable Functions (similar to before, but generalized) ---
+
 
 def pandas_to_clickhouse_schema(df: pd.DataFrame, pk: str) -> str:
-    # (This function is identical to the one in the previous script)
     pass # For brevity
 
 def ensure_clickhouse_table_exists(client, table_config: Dict[str, Any], df_schema: pd.DataFrame):
     """Creates a ReplacingMergeTree table based on the configuration."""
-    # (Similar to before, but uses the config dictionary)
-    pass # For brevity
+    pass 
 
 def get_high_water_mark_clickhouse(client, table_config: Dict[str, Any]) -> str:
     """Queries ClickHouse for the max incremental key value for a specific table."""
-    # (Similar to before, but uses the config dictionary)
-    pass # For brevity
+    pass 
 
 
 def process_table(client, table_config: Dict[str, Any]):

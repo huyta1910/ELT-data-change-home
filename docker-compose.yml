@@ -1,5 +1,5 @@
-# docker-compose.yml
-version: '3.8'
+# This file defines your entire local development environment
+# Run it with: docker-compose up --build -d
 
 services:
   # 1. Postgres: Airflow's metadata database
@@ -16,47 +16,12 @@ services:
       - data_elt_network
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "airflow", "-d", "airflow"]
-      interval: 5s
+      interval: 10s
       timeout: 5s
       retries: 5
 
-  # 2. ClickHouse: Your data warehouse
-  clickhouse:
-    image: clickhouse/clickhouse-server:23.8 # Using a specific stable version
-    container_name: clickhouse_server
-    ports:
-      - "8123:8123" # HTTP interface for clients like the Python script and CloudBeaver
-      - "9000:9000" # Native TCP interface
-    environment:
-      - CLICKHOUSE_DB=analytics_raw
-      - CLICKHOUSE_USER=default
-      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD} # Comes from the .env file
-      - CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT=1
-    volumes:
-      - clickhouse-data:/var/lib/clickhouse/
-    networks:
-      - data_elt_network
-    ulimits: # Important for ClickHouse performance
-      nproc: 65535
-      nofile:
-        soft: 262144
-        hard: 262144
-
-  # 3. CloudBeaver: The Web UI for ClickHouse
-  cloudbeaver:
-    image: dbeaver/cloudbeaver:latest
-    container_name: cloudbeaver_ui
-    ports:
-      - "8978:8978" # Access CloudBeaver UI at http://localhost:8978
-    volumes:
-      - cloudbeaver-data:/opt/cloudbeaver/workspace
-    depends_on:
-      - clickhouse # Ensures ClickHouse starts before CloudBeaver
-    networks:
-      - data_elt_network
-
-  # 4. Airflow Services
-  # The 'airflow-init' service initializes the database and creates the first user
+  # 2. Airflow Services
+  # This service initializes the Airflow database on the first run
   airflow-init:
     build:
       context: .
@@ -64,7 +29,7 @@ services:
     container_name: airflow_init
     depends_on:
       postgres:
-        condition: service_healthy # Waits for Postgres to be ready
+        condition: service_healthy
     environment:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
@@ -73,7 +38,7 @@ services:
     networks:
       - data_elt_network
 
-  # The main Airflow web UI
+  # The Airflow Webserver (UI)
   airflow-webserver:
     build:
       context: .
@@ -83,36 +48,41 @@ services:
     depends_on:
       - airflow-init
     ports:
-      - "8080:8080"
+      - "8080:8080" # Access the Airflow UI at http://localhost:8080
     volumes:
       - ./airflow/dags:/opt/airflow/dags
       - ./airflow/logs:/opt/airflow/logs
       - ./scripts:/opt/airflow/scripts
       - ./dbt_project:/opt/airflow/dbt_project
+      # IMPORTANT: Mount your GCP service account key into the container
+      - ./gcp-credentials.json:/opt/airflow/gcp/gcp-credentials.json:ro
     networks:
       - data_elt_network
-    environment: &airflow_env # YAML anchor for re-using this environment block
+    environment: &airflow_env # YAML anchor to reuse this block
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
       - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres/airflow
       - AIRFLOW__WEBSERVER__SECRET_KEY=a_super_secret_key_for_webserver_sessions
-      # --- Pass all credentials to the Airflow environment ---
+      
+      # --- Pass all credentials from the .env file to the Airflow environment ---
+      # SQL Server Credentials
       - SQL_SERVER_HOST=${SQL_SERVER_HOST}
       - SQL_DATABASE=${SQL_DATABASE}
       - SQL_USERNAME=${SQL_USERNAME}
       - SQL_PASSWORD=${SQL_PASSWORD}
-      - CLICKHOUSE_HOST=clickhouse # The service name of the ClickHouse container
-      - CLICKHOUSE_PORT=8123
-      - CLICKHOUSE_USER=default
-      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
-      - CLICKHOUSE_DB=analytics_raw
+      
+      # Google Cloud Credentials & Config
+      - GCP_PROJECT_ID=${GCP_PROJECT_ID}
+      - BQ_RAW_DATASET=${BQ_RAW_DATASET}
+      # This tells the Google Cloud libraries inside the container where to find the key file
+      - GOOGLE_APPLICATION_CREDENTIALS=/opt/airflow/gcp/gcp-credentials.json
     command: airflow webserver
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
-      interval: 10s
+      interval: 15s
       timeout: 10s
       retries: 5
 
-  # The Airflow component that runs the scheduled tasks
+  # The Airflow Scheduler (the engine that runs your tasks)
   airflow-scheduler:
     build:
       context: .
@@ -126,6 +96,8 @@ services:
       - ./airflow/logs:/opt/airflow/logs
       - ./scripts:/opt/airflow/scripts
       - ./dbt_project:/opt/airflow/dbt_project
+      # The scheduler also needs access to the GCP key
+      - ./gcp-credentials.json:/opt/airflow/gcp/gcp-credentials.json:ro
     networks:
       - data_elt_network
     environment: *airflow_env # Re-uses the environment block from the webserver
@@ -138,5 +110,3 @@ networks:
 
 volumes:
   postgres-db-volume:
-  clickhouse-data:
-  cloudbeaver-data:

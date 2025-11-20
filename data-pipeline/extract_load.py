@@ -31,11 +31,13 @@ LOAD_TIMESTAMP_COLUMN = 'loaded_at_ts'
 
 
 TABLES_TO_INGEST: List[Dict[str, Any]] = [
+    # {"source_name": "dbo.HoaDon_ChiTietHangHoa", "dest_name": "raw_hoadon_chitiethanghoa", "pk": "id"},
     {"source_name": "dbo.CuaHang", "dest_name": "raw_cuahang", "pk": "id"},
     {"source_name": "dbo.Ca", "dest_name": "raw_ca", "pk": "id"},
     {"source_name": "dbo.HoaDon", "dest_name": "raw_transactions", "pk": "id"},
-    {"source_name": "dbo.HoaDon_GiamGia", "dest_name": "raw_sql_hoadon_giamgia", "pk": "id"},
-    {"source_name": "dbo.HoaDon_ChiTietHangHoa", "dest_name": "raw_hoadon_chitiethanghoa", "pk": "id"}
+    {"source_name": "dbo.KhachHang", "dest_name": "raw_customer", "pk": "id"},
+    {"source_name": "dbo.HoaDon_GiamGia", "dest_name": "raw_sql_hoadon_giamgia", "pk": "id"}
+
 ]
 
 def get_sql_connection_string() -> str:

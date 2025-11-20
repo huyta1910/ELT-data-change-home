@@ -1,0 +1,14 @@
+# dbt_project/models/sources/sources.yml
+
+version: 2
+
+sources:
+  - name: analytics_raw # A name for your raw data schema
+    schema: analytics_raw # This must match the dataset name in BigQuery
+    tables:
+      - name: raw_cuahang
+      - name: raw_ca
+      - name: raw_customer
+      - name: raw_transactions
+      - name: raw_sql_hoadon_giamgia
+      - name: raw_hoadon_chitiethanghoa

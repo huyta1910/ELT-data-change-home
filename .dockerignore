@@ -13,7 +13,7 @@ __pycache__
 .dockerignore
 Dockerfile
 
-airflow/logs
+airflow/logs 
 airflow/plugins
 
 .env

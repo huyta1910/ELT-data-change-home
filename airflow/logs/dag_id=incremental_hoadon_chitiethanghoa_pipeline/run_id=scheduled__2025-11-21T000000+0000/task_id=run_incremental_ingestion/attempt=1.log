@@ -1,0 +1,33 @@
+[2025-11-22T07:13:12.204+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2025-11-22T07:13:12.244+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: incremental_hoadon_chitiethanghoa_pipeline.run_incremental_ingestion scheduled__2025-11-21T00:00:00+00:00 [queued]>
+[2025-11-22T07:13:12.254+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: incremental_hoadon_chitiethanghoa_pipeline.run_incremental_ingestion scheduled__2025-11-21T00:00:00+00:00 [queued]>
+[2025-11-22T07:13:12.255+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 1
+[2025-11-22T07:13:12.270+0000] {taskinstance.py:2330} INFO - Executing <Task(BashOperator): run_incremental_ingestion> on 2025-11-21 00:00:00+00:00
+[2025-11-22T07:13:12.275+0000] {standard_task_runner.py:63} INFO - Started process 217 to run task
+[2025-11-22T07:13:12.278+0000] {standard_task_runner.py:90} INFO - Running: ['***', 'tasks', 'run', 'incremental_hoadon_chitiethanghoa_pipeline', 'run_incremental_ingestion', 'scheduled__2025-11-21T00:00:00+00:00', '--job-id', '3', '--raw', '--subdir', 'DAGS_FOLDER/pipeline.py', '--cfg-path', '/tmp/tmpgexbg27b']
+[2025-11-22T07:13:12.281+0000] {standard_task_runner.py:91} INFO - Job 3: Subtask run_incremental_ingestion
+[2025-11-22T07:13:12.339+0000] {task_command.py:426} INFO - Running <TaskInstance: incremental_hoadon_chitiethanghoa_pipeline.run_incremental_ingestion scheduled__2025-11-21T00:00:00+00:00 [running]> on host 609c91fb64db
+[2025-11-22T07:13:12.433+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='incremental_hoadon_chitiethanghoa_pipeline' AIRFLOW_CTX_TASK_ID='run_incremental_ingestion' AIRFLOW_CTX_EXECUTION_DATE='2025-11-21T00:00:00+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='scheduled__2025-11-21T00:00:00+00:00'
+[2025-11-22T07:13:12.434+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2025-11-22T07:13:12.469+0000] {subprocess.py:63} INFO - Tmp dir root location: /tmp
+[2025-11-22T07:13:12.470+0000] {subprocess.py:75} INFO - Running command: ['/usr/bin/bash', '-c', 'python /opt/***/scripts/ingest_incremental.py']
+[2025-11-22T07:13:12.481+0000] {subprocess.py:86} INFO - Output:
+[2025-11-22T07:13:12.550+0000] {subprocess.py:93} INFO - python: can't open file '/opt/***/scripts/ingest_incremental.py': [Errno 2] No such file or directory
+[2025-11-22T07:13:12.553+0000] {subprocess.py:97} INFO - Command exited with return code 2
+[2025-11-22T07:13:12.554+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2025-11-22T07:13:12.564+0000] {taskinstance.py:2905} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 465, in _execute_task
+    result = _execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/taskinstance.py", line 432, in _execute_callable
+    return execute_callable(context=context, **execute_callable_kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/models/baseoperator.py", line 401, in wrapper
+    return func(self, *args, **kwargs)
+  File "/home/airflow/.local/lib/python3.8/site-packages/airflow/operators/bash.py", line 243, in execute
+    raise AirflowException(
+airflow.exceptions.AirflowException: Bash command failed. The command returned a non-zero exit code 2.
+[2025-11-22T07:13:12.568+0000] {taskinstance.py:1206} INFO - Marking task as FAILED. dag_id=incremental_hoadon_chitiethanghoa_pipeline, task_id=run_incremental_ingestion, run_id=scheduled__2025-11-21T00:00:00+00:00, execution_date=20251121T000000, start_date=20251122T071312, end_date=20251122T071312
+[2025-11-22T07:13:12.581+0000] {standard_task_runner.py:110} ERROR - Failed to execute job 3 for task run_incremental_ingestion (Bash command failed. The command returned a non-zero exit code 2.; 217)
+[2025-11-22T07:13:12.614+0000] {local_task_job_runner.py:240} INFO - Task exited with return code 1
+[2025-11-22T07:13:12.631+0000] {taskinstance.py:3503} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2025-11-22T07:13:12.633+0000] {local_task_job_runner.py:222} INFO - ::endgroup::

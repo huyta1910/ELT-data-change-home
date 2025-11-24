@@ -9,7 +9,7 @@ def main():
     table_id = 'raw_hoadon'
 
     if not os.path.exists(keyfile):
-        print(f'ERROR: service account keyfile not found at {keyfile}', file=sys.stderr)
+        print(f'ERROR: service account keyfile not found at {keyfile}', file=sys.stdemr)
         sys.exit(2)
 
     client = bigquery.Client.from_service_account_json(keyfile, project=project)

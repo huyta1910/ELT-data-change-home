@@ -27,8 +27,7 @@ CHUNKSIZE = 100000
 LOAD_TIMESTAMP_COLUMN = 'loaded_at_ts'
 
 # --- CONFIGURATION ---
-# 'source_date_col': This is the column in SQL SERVER (e.g. created_date) 
-# that we will compare against the 'loaded_at_ts' time.
+
 TABLES_TO_INGEST: List[Dict[str, Any]] = [
     {"source_name": "dbo.HoaDon_ChiTietHangHoa", "dest_name": "raw_hoadon_chitiethanghoa", "pk": "id", "source_date_col": "created_date"},
     {"source_name": "dbo.CuaHang", "dest_name": "raw_cuahang", "pk": "id", "source_date_col": "created_date"},
